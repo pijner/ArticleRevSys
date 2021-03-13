@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <h:head>
+        <title>Submit a new review</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    </h:head>
+    <h:body>
+        <ui:include src="/template/_header.xhtml"/>
+
+        <p:card>
+            <div class="ui-fluid" style="margin: 8px;">
+                <div class="p-field" style="margin: 16px;">
+                    <label for="name">Reviewer name</label>
+                    <p:inputText id="name" type="text"/>
+                </div>
+                
+                <div class="p-field" style="margin: 16px;">
+                    <label for="title">Publication title</label>
+                    <p:inputText id="title" type="text" />
+                </div>
+                <div class="p-field" style="margin: 16px;">
+                    <label for="url">Publication URL</label>
+                    <p:inputText id="url" type="text" />
+                </div>
+                <div class="p-field" style="margin: 16px;">
+                    <label for="summary">Summary</label>
+                    <p:inputTextarea id="summary" />
+                </div>
+                
+                <div class="p-field" style="margin: 16px;">
+                    <label for="posneg">Positives/Negatives</label>
+                    <p:inputTextarea id="posneg" />
+                </div>
+                
+                <div class="p-field" style="margin: 16px;">
+                    <label for="majorp">Major points</label>
+                    <p:inputTextarea id="majorp" />
+                </div>
+                
+                <div class="p-field" style="margin: 16px;">
+                    <label for="minorp">Minor points</label>
+                    <p:inputTextarea id="minorp" />
+                </div>
+                
+                <div class="p-field" style="margin: 16px;">
+                    <label for="lastname">Recommendation</label>
+                    <p:selectOneRadio>
+                        <f:selectItem itemLabel="Accept" itemValue="Accept"/>
+                        <f:selectItem itemLabel="Reject" itemValue="Reject"/>
+                        <f:selectItem itemLabel="Minor revision" itemValue="Minor revision"/>
+                        <f:selectItem itemLabel="Major revision" itemValue="Major revision"/>
+                    </p:selectOneRadio>
+                </div>
+                
+                <p:commandButton value="Submit"/>
+                
+                
+            </div>
+
+        </p:card>
+
+    </h:body>
+</html>
