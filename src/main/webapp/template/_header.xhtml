@@ -1,4 +1,7 @@
 <?xml version='1.0' encoding='UTF-8' ?> 
+<!--
+This is the template for the header and background for the lookup.xhtml and new_review.xhtml pages
+-->
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
@@ -12,13 +15,13 @@
         <title>Facelets Template</title>
     </h:head>
 
-    <h:body>
+    <h:body style="background: #2980b9">
 
-        <div style="background: #c8d6e5; padding: 16px">
+        <div style="background: #ffffff; padding: 8px">
             <h:form>
-                <p:commandButton styleClass="ui-button-secondary ui-button-flat" value="ArticleRevSys" style="color: #10ac84; font-weight: bold; font-size-adjust: 0.6" action="index"/>
-                <p:commandButton styleClass="ui-button-secondary ui-button-flat" value="Submit a new review" style="margin: 0 auto; margin-left: 1.0rem" action="new_review"/>
-                <p:commandButton styleClass="ui-button-secondary ui-button-flat" value="Look up existing reviews" style="margin: auto; margin-left: 1.0rem" action="lookup.xhtml"/>
+                <p:commandButton styleClass="ui-button-secondary ui-button-flat" value="ArticleRevSys" style="color: #2980b9; font-weight: bold; font-size-adjust: 0.6" action="index"/>
+                <p:commandButton styleClass="ui-button-secondary ui-button-flat" value="Submit a new review" style="margin: 0 auto; margin-left: 1.0rem" action="/new_review.xhtml?faces-redirect=true"/>
+                <p:commandButton styleClass="ui-button-secondary ui-button-flat" value="Look up existing reviews" style="margin: auto; margin-left: 1.0rem" action="/lookup.xhtml?faces-redirect=true"/>
             </h:form>
         </div>
 

@@ -5,19 +5,19 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
+import javax.faces.context.FacesContext;
 
 /**
+ * This class handles all communication to the database. The connection
+ * parameters are defined in the default constructor.
  *
  * @author Prahar Ijner
  */
 public class DBConnector {
+
     private final String serverName;
     private final int portNumber;
     private final String user;
@@ -25,16 +25,16 @@ public class DBConnector {
     private final String databaseName;
     private final MysqlDataSource dataSource;
 
-    public DBConnector(){
+    public DBConnector() {
         this.serverName = "localhost";
         this.portNumber = 3306;
         this.user = "root";
         this.password = "dbPassword";
-        this.databaseName = "esdb";
+        this.databaseName = "ARS";
         this.dataSource = new MysqlDataSource();
         connectDataSource();
     }
-    
+
     public DBConnector(String serverName, int portNumber, String user, String password, String databaseName) {
         this.serverName = serverName;
         this.portNumber = portNumber;
@@ -44,13 +44,8 @@ public class DBConnector {
         this.dataSource = new MysqlDataSource();
         connectDataSource();
     }
-    
-    public final void connectDataSource(){
-//        dataSource.setServerName(this.serverName);
-//        dataSource.setPortNumber(this.portNumber);
-//        dataSource.setDatabaseName(this.databaseName);
 
-        // Temporary Solution
+    public final void connectDataSource() {
         String url = String.format(
                 "jdbc:mysql://%s:%d/%s?allowPublicKeyRetrieval=true&useSSL=false",
                 this.serverName,
@@ -58,17 +53,19 @@ public class DBConnector {
                 this.databaseName);
         dataSource.setURL(url);
         dataSource.setUser(this.user);
-        dataSource.setPassword(this.password);        
+        dataSource.setPassword(this.password);
     }
-    
+
     /**
-     * Function to close result set, statement, and connection. Always call this after executing a query
+     * Function to close result set, statement, and connection. Always call this
+     * after executing a query
+     *
      * @param rs ResultSet that reads the result of a query
      * @param st Statement that executes the query
      * @param cn Connection obtained from data source
      */
-    private void close(ResultSet rs, Statement st, Connection cn){
-        if (rs != null){
+    private void close(ResultSet rs, Statement st, Connection cn) {
+        if (rs != null) {
             try {
                 rs.close();
             } catch (SQLException ex) {
@@ -76,7 +73,7 @@ public class DBConnector {
             }
         }
 
-        if (st != null){
+        if (st != null) {
             try {
                 st.close();
             } catch (SQLException ex) {
@@ -84,7 +81,7 @@ public class DBConnector {
             }
         }
 
-        if (cn != null){
+        if (cn != null) {
             try {
                 cn.close();
             } catch (SQLException ex) {
@@ -92,293 +89,186 @@ public class DBConnector {
             }
         }
     }
-    
-    
-    public String writeReview(Review r){
-        String status = "Failed";
-        
+
+    /**
+     * function to write a given review to the DB
+     *
+     * @param r: Review object to be written to the database
+     * @return String indicating pass or fail (status of writing)
+     */
+    public String writeReview(Review r) {
+        Connection dbConnection = null;
+        Statement dbStatement = null;
+
+        try {
+            FacesContext context = FacesContext.getCurrentInstance();
+            User u = context.getApplication().evaluateExpressionGet(context, "#{user}", User.class);
+            u.updateID();
+
+            dbConnection = dataSource.getConnection();
+            dbStatement = dbConnection.createStatement();
+            String query = String.format(
+                    "INSERT INTO reviews "
+                    + "(user_id, title, url, summary, posneg, majorPoints, minorPoints, rec) "
+                    + "VALUES (%d, '%s\', '%s', '%s', '%s', '%s', '%s', '%s' );",
+                    u.getUser_id(),
+                    r.getTitle(),
+                    r.getUrl(),
+                    r.getSummary(),
+                    r.getPosneg(),
+                    r.getMajorPoints(),
+                    r.getMinorPoints(),
+                    r.getRecommendation()
+            );
+            dbStatement.executeUpdate(query);
+
+        } catch (SQLException ex) {
+            Logger.getLogger(DBConnector.class.getName()).log(Level.SEVERE, null, ex);
+            return "fail";
+        } finally {
+            this.close(null, dbStatement, dbConnection);
+        }
+        return "pass";
+    }
+
+    /**
+     * function to retrieve a user with a given name
+     *
+     * @param name; String representing the name to look up
+     * @return User object containing name and user_id
+     */
+    public User getUserByName(String name) {
         Connection dbConnection = null;
         Statement dbStatement = null;
         ResultSet result = null;
-        
+        User queriedUser = null;
+
         try {
             dbConnection = dataSource.getConnection();
             dbStatement = dbConnection.createStatement();
             String query = String.format(
-                        "INSERT INTO reviews VALUES ("
+                    "SELECT * FROM users WHERE "
+                    + "name = '%s';", name
             );
-            
-            
+            result = dbStatement.executeQuery(query);
+
+            while (result.next()) {
+                queriedUser = new User(result.getString("name"), result.getInt("user_id"));
+                break;
+            }
         } catch (SQLException ex) {
             Logger.getLogger(DBConnector.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            this.close(result, dbStatement, dbConnection);
         }
-        
-        
-        return status;
+        return queriedUser;
     }
-    
-    
-    
-//    public Company getCompanyByID(Integer companyID) {
-//        Connection dbConnection = null;
-//        Statement dbStatement = null;
-//        ResultSet result = null;
-//        Company queriedCompany = null;
-//        
-//        try {
-//            dbConnection = dataSource.getConnection();
-//            dbStatement = dbConnection.createStatement();
-//            String query = String.format(
-//                    "SELECT * FROM company WHERE "
-//                            + "company_id = %d;", 
-//                    companyID);
-//            result = dbStatement.executeQuery(query);
-//
-//            queriedCompany = new Company();
-//
-//            while (result.next()){
-//                queriedCompany.setCompany_id(result.getInt("company_id"));
-//                queriedCompany.setCompany_name(result.getString("company_name"));
-//                queriedCompany.setCompany_hours(new WeeklyTimes(result.getString("regular_hours")));
-//            }
-//        } catch (SQLException ex){
-//            Logger.getLogger(DBConnector.class.getName()).log(Level.SEVERE, null, ex);
-//        } finally {
-//            this.close(result, dbStatement, dbConnection);
-//        }
-//        
-//        return queriedCompany;
-//    }
-//    
-//    public ArrayList<Shift> getShiftsByEmployee(Integer employeeID) {
-//        Connection dbConnection = null;
-//        Statement dbStatement = null;
-//        ResultSet result = null;
-//        ArrayList<Shift> shifts = null;
-//        
-//        try{
-//            dbConnection = dataSource.getConnection();
-//            dbStatement = dbConnection.createStatement();
-//            String query = String.format(
-//                    "SELECT * FROM shift WHERE "
-//                            + "employee_id_worker = %d;", 
-//                    employeeID);
-//            result = dbStatement.executeQuery(query);
-//
-//            shifts = new ArrayList<>();
-//
-//            while (result.next()){
-//                Shift currentShift = new Shift();
-//
-//                currentShift.setEmployee_id_worker(result.getInt("employee_id_worker"));
-//                currentShift.setEmployee_id_manager(result.getInt("employee_id_manager"));
-//
-//                Timestamp startTime = result.getTimestamp("start_time");
-//                Timestamp endTime = result.getTimestamp("end_time");
-//
-//                currentShift.setStartTime(startTime.toLocalDateTime());
-//                currentShift.setEndTime(endTime.toLocalDateTime());
-//
-//                try{
-//                    Timestamp checkIn = result.getTimestamp("check_in");
-//                    Timestamp checkOut = result.getTimestamp("check_out");
-//
-//                    currentShift.setCheckInTime(checkIn.toLocalDateTime());
-//                    currentShift.setCheckOutTime(checkOut.toLocalDateTime());
-//                } catch (NullPointerException e){
-//                    // If there is no check in date, we don't set it in the object
-//                }
-//
-//                currentShift.setShift_id(result.getInt("shift_id"));
-//                currentShift.setNotes(result.getString("notes"));
-//
-//                shifts.add(currentShift);
-//            }
-//            System.out.println("Shifts added");
-//        } catch (SQLException ex){
-//            Logger.getLogger(DBConnector.class.getName()).log(Level.SEVERE, null, ex);
-//        } finally {
-//            this.close(result, dbStatement, dbConnection);
-//        }
-//        
-//        return shifts;
-//    }
-//    
-//    public Employee getEmployeeByID(Integer employeeID, Integer companyID) throws SQLException{
-//        Connection dbConnection = null;
-//        Statement dbStatement = null;
-//        ResultSet result = null;
-//        Employee queriedEmployee = null;
-//        
-//        try {
-//            dbConnection = dataSource.getConnection();
-//            dbStatement = dbConnection.createStatement();
-//            String query = String.format(
-//                    "SELECT * FROM employee WHERE "
-//                            + "employee_id = %d AND "
-//                            + "company_id = %d;", 
-//                    employeeID, companyID);
-//        
-//            result = dbStatement.executeQuery(query);
-//        
-//            queriedEmployee = new Employee();
-//            while (result.next()){
-//                queriedEmployee.setUsername(result.getString("username"));
-//                queriedEmployee.setEmployeeID(employeeID);
-//                queriedEmployee.setName(result.getString("employee_name"));
-//                queriedEmployee.setEmployeeType(result.getBoolean("employee_type"));
-//                queriedEmployee.setManagerAccess(result.getBoolean("manager_access"));
-//                queriedEmployee.setEmployeeCompany(this.getCompanyByID(companyID));
-//                queriedEmployee.setManagerID(result.getInt("manager_id"));
-//
-//                // TODO: figure out a way to add ExceptionTimes
-//
-//                ArrayList<Shift> employeeShifts = this.getShiftsByEmployee(queriedEmployee.getEmployeeID());
-//                queriedEmployee.setEmployeeShifts(employeeShifts);
-//
-//                String availableTimes = result.getString("available_hours");
-//                WeeklyTimes weeklyTimes = new WeeklyTimes(availableTimes);
-//                queriedEmployee.setAvailable_hours(weeklyTimes);
-//            }
-//        } catch (SQLException ex){
-//            Logger.getLogger(DBConnector.class.getName()).log(Level.SEVERE, null, ex);
-//        } finally {
-//            this.close(result, dbStatement, dbConnection);
-//        }
-//        return queriedEmployee;
-//    }
-//    
-//    public Employee getEmployeeByLogin(String username, String password) throws SQLException{
-//        Connection dbConnection = null;
-//        Statement dbStatement = null;
-//        ResultSet result = null;
-//        Employee queriedEmployee = null;
-//        
-//        try {
-//            dbConnection = dataSource.getConnection();
-//            dbStatement = dbConnection.createStatement();
-//            System.out.println("Connection established and statement issued");
-//            String query = String.format(
-//                    "SELECT * FROM employee WHERE "
-//                            + "username = '%s' AND "
-//                            + "password = (SELECT SHA2('%s', 224));", 
-//                    username, password);
-//
-//            System.out.println("Using query: " + query);
-//
-//            result = dbStatement.executeQuery(query);
-//
-//            queriedEmployee = new Employee();
-//            while (result.next()){
-//                System.out.println("Employee found!");
-//                queriedEmployee.setUsername(username);
-//                queriedEmployee.setEmployeeID(result.getInt("employee_id"));
-//                System.out.println("ID added!");
-//                queriedEmployee.setName(result.getString("employee_name"));
-//                System.out.println("Name added!");
-//                queriedEmployee.setEmployeeType(result.getBoolean("employee_type"));
-//                System.out.println("Type added!");
-//                queriedEmployee.setManagerAccess(result.getBoolean("manager_access"));
-//                System.out.println("Access level added!");
-//
-//                queriedEmployee.setManagerID(result.getInt("manager_id"));
-//                System.out.println("Manager ID added!");
-//
-//                Integer companyID = result.getInt("company_id");
-//                queriedEmployee.setEmployeeCompany(this.getCompanyByID(companyID));
-//                System.out.println("Company found!");
-//                // TODO: figure out a way to add ExceptionTimes
-//
-//                ArrayList<Shift> employeeShifts = this.getShiftsByEmployee(queriedEmployee.getEmployeeID());
-//                queriedEmployee.setEmployeeShifts(employeeShifts);
-//                System.out.println("Shifts added!");
-//
-//                String availableTimes = result.getString("available_hours");
-//                System.out.println(availableTimes);
-//                WeeklyTimes weeklyTimes = new WeeklyTimes(availableTimes);
-//                queriedEmployee.setAvailable_hours(weeklyTimes);
-//                System.out.println("Available hours added!");
-//            }
-//        } catch (SQLException ex){
-//            Logger.getLogger(DBConnector.class.getName()).log(Level.SEVERE, null, ex);
-//        } finally {
-//            this.close(result, dbStatement, dbConnection);
-//        }
-//        
-//        return queriedEmployee;
-//    }
-//    
-//    public TimelineModel<String, ?> getCompanyShifts(Integer companyID, LocalDateTime startDate, LocalDateTime endDate) throws SQLException{
-//        Connection dbConnection = null;
-//        Statement dbStatement = null;
-//        ResultSet result = null;
-//        TimelineModel<String, ?> model = null;
-//        
-//        try {
-//            dbConnection = dataSource.getConnection();
-//            dbStatement = dbConnection.createStatement();
-//            String query = String.format(
-//                    "SELECT employee_id, employee_name FROM employee WHERE "
-//                            + "company_id = %d;", 
-//                    companyID);
-//
-//            result = dbStatement.executeQuery(query);
-//            
-//            model = new TimelineModel<>();
-//            
-//            while (result.next()){
-//                Integer employeeID = result.getInt("employee_id");
-//
-//                Employee currentEmployee = this.getEmployeeByID(employeeID, companyID);
-//
-//                // Add availablity
-//                LocalDateTime currentDate = startDate;
-//                long numDays = startDate.until(endDate, ChronoUnit.DAYS);
-//                for(long i=0; i<numDays; i++){
-//                    String day = currentDate.getDayOfWeek().toString().toLowerCase();
-//                    day = day.substring(0, 1).toUpperCase() + day.substring(1);
-//
-//                    ArrayList<WeeklyTimes.StartEndTimes> availablity = currentEmployee.getAvailable_hours().getTimesOnDay(day);
-//                    for(WeeklyTimes.StartEndTimes currentAvailablity: availablity){
-//                        LocalDateTime availablityStart = currentAvailablity.getStartTime().atDate(currentDate.toLocalDate());
-//                        LocalDateTime availablityEnd = currentAvailablity.getEndTime().atDate(currentDate.toLocalDate());
-//
-//                        TimelineEvent e = TimelineEvent.builder()
-//                                .data("Available")
-//                                .startDate(availablityStart)
-//                                .endDate(availablityEnd)
-//                                .group(currentEmployee.getName())
-//                                .styleClass("available")
-//                                .build();
-//
-//                        model.add(e);
-//                    }
-//
-//                    currentDate = currentDate.plusDays(1);
-//                }
-//
-//                ArrayList<Shift> thisEmpShifts = currentEmployee.getEmployeeShifts();
-//                for(Shift s: thisEmpShifts){
-//
-//                    if(s.getStartTime().isAfter(endDate) || s.getEndTime().isBefore(startDate))
-//                        continue;
-//
-//                    TimelineEvent e = TimelineEvent.builder()
-//                            .data("Scheduled")
-//                            .startDate(s.getStartTime())
-//                            .endDate(s.getEndTime())
-//                            .group(currentEmployee.getName())
-//                            .styleClass("scheduled")
-//                            .build();
-//
-//                    model.add(e);
-//                }
-//            }    
-//        } catch (SQLException ex){
-//            Logger.getLogger(DBConnector.class.getName()).log(Level.SEVERE, null, ex);
-//        } finally {
-//            this.close(result, dbStatement, dbConnection);
-//        }
-//        return model;
-//    }
+
+    /**
+     * function to add a user to the DB. Since the user table only consists of
+     * name and user_id (which is auto-generated), we only need the name
+     *
+     * @param name: String representing user's name
+     */
+    public void addUser(String name) {
+        Connection dbConnection = null;
+        Statement dbStatement = null;
+
+        try {
+            dbConnection = dataSource.getConnection();
+            dbStatement = dbConnection.createStatement();
+            String query = String.format(
+                    "INSERT INTO users (name) VALUES ('%s');",
+                    name
+            );
+
+            dbStatement.executeUpdate(query);
+
+        } catch (SQLException ex) {
+            Logger.getLogger(DBConnector.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            this.close(null, dbStatement, dbConnection);
+        }
+    }
+
+    /**
+     * function to add score to the database
+     *
+     * @param review_id: int representing the ID of the review scored
+     * @param user_id: int representing the ID of the user who scored
+     * @param score: int representing the score
+     */
+    public void addScore(int review_id, int user_id, int score) {
+        Connection dbConnection = null;
+        Statement dbStatement = null;
+
+        try {
+            dbConnection = dataSource.getConnection();
+            dbStatement = dbConnection.createStatement();
+            String query = String.format(
+                    "INSERT INTO scores (user_id, score, review_id) "
+                    + "VALUES (%d, %d, %d);",
+                    user_id, score, review_id
+            );
+            dbStatement.executeUpdate(query);
+        } catch (SQLException ex) {
+            Logger.getLogger(DBConnector.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            this.close(null, dbStatement, dbConnection);
+        }
+    }
+
+    /**
+     * function to load all reviews from the database
+     *
+     * @return ArrayList<> containing all the reviews
+     */
+    public ArrayList<Review> getReviews() {
+        Connection dbConnection = null;
+        Statement dbStatement = null;
+        ResultSet result = null;
+        ArrayList<Review> reviewList = null;
+
+        try {
+            dbConnection = dataSource.getConnection();
+            dbStatement = dbConnection.createStatement();
+            String query = String.format("SELECT * FROM reviews "
+                    + "JOIN users ON reviews.user_id = users.user_id "
+                    + "LEFT JOIN ( "
+                    + "SELECT sum(score)/count(score) AS avg_score, "
+                    + "count(score) AS num_scores, "
+                    + "review_id "
+                    + "FROM scores "
+                    + "GROUP BY review_id) as averages "
+                    + "ON averages.review_id = reviews.review_id;"
+            );
+
+            result = dbStatement.executeQuery(query);
+            reviewList = new ArrayList<>();
+
+            while (result.next()) {
+                reviewList.add(
+                        new Review(
+                                result.getString("name"),
+                                result.getString("title"),
+                                result.getString("url"),
+                                result.getString("summary"),
+                                result.getString("posneg"),
+                                result.getString("majorPoints"),
+                                result.getString("minorPoints"),
+                                result.getString("rec"),
+                                result.getInt("num_scores"),
+                                result.getFloat("avg_score"),
+                                result.getInt("review_id")
+                        )
+                );
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(DBConnector.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            this.close(result, dbStatement, dbConnection);
+        }
+
+        return reviewList;
+    }
 }

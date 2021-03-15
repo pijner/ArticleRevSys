@@ -16,58 +16,110 @@ and open the template in the editor.
     </h:head>
     <h:body>
         <ui:include src="/template/_header.xhtml"/>
+        <h:form style="margin-top: 0.25%">
+            <p:card>
+                <div class="ui-fluid" style="margin: 8px;">
+                    <div class="p-field" style="margin: 16px;">
+                        <label for="name">Reviewer name</label>
+                        <p:inputText id="name" type="text" value="#{user.name}"/>
+                    </div>
 
-        <p:card>
-            <div class="ui-fluid" style="margin: 8px;">
-                <div class="p-field" style="margin: 16px;">
-                    <label for="name">Reviewer name</label>
-                    <p:inputText id="name" type="text"/>
-                </div>
-                
-                <div class="p-field" style="margin: 16px;">
-                    <label for="title">Publication title</label>
-                    <p:inputText id="title" type="text" />
-                </div>
-                <div class="p-field" style="margin: 16px;">
-                    <label for="url">Publication URL</label>
-                    <p:inputText id="url" type="text" />
-                </div>
-                <div class="p-field" style="margin: 16px;">
-                    <label for="summary">Summary</label>
-                    <p:inputTextarea id="summary" />
-                </div>
-                
-                <div class="p-field" style="margin: 16px;">
-                    <label for="posneg">Positives/Negatives</label>
-                    <p:inputTextarea id="posneg" />
-                </div>
-                
-                <div class="p-field" style="margin: 16px;">
-                    <label for="majorp">Major points</label>
-                    <p:inputTextarea id="majorp" />
-                </div>
-                
-                <div class="p-field" style="margin: 16px;">
-                    <label for="minorp">Minor points</label>
-                    <p:inputTextarea id="minorp" />
-                </div>
-                
-                <div class="p-field" style="margin: 16px;">
-                    <label for="lastname">Recommendation</label>
-                    <p:selectOneRadio>
-                        <f:selectItem itemLabel="Accept" itemValue="Accept"/>
-                        <f:selectItem itemLabel="Reject" itemValue="Reject"/>
-                        <f:selectItem itemLabel="Minor revision" itemValue="Minor revision"/>
-                        <f:selectItem itemLabel="Major revision" itemValue="Major revision"/>
-                    </p:selectOneRadio>
-                </div>
-                
-                <p:commandButton value="Submit"/>
-                
-                
-            </div>
 
-        </p:card>
+                    <div class="p-field" style="margin: 16px;">
+                        <label for="title">Publication title</label>
+                        <p:inputText id="title" type="text" value="#{createReview.title}"/>
+                    </div>
+                    <div class="p-field" style="margin: 16px;">
+                        <label for="url">Publication URL</label>
+                        <p:inputText id="url" type="text" value="#{createReview.url}"/>
+                    </div>
+                    <div class="p-field" style="margin: 16px;">
+                        <label for="summary">Summary</label>
+                        <p:textEditor id="summary" value="#{createReview.summary}">
+                            <f:facet name="toolbar">
+                                <span class="ql-formats">
+                                    <button class="ql-bold"></button>
+                                    <button class="ql-italic"></button>
+                                    <button class="ql-underline"></button>
+                                    <button class="ql-strike"></button>
+                                </span>
+                                <span class="ql-formats">
+                                    <select class="ql-font"></select>
+                                    <select class="ql-size"></select>
+                                </span>
+                            </f:facet>
+                        </p:textEditor>
+                    </div>
 
+                    <div class="p-field" style="margin: 16px;">
+                        <label for="posneg">Positives/Negatives</label>
+
+                        <p:textEditor id="posneg" value="#{createReview.posneg}">
+                            <f:facet name="toolbar">
+                                <span class="ql-formats">
+                                    <button class="ql-bold"></button>
+                                    <button class="ql-italic"></button>
+                                    <button class="ql-underline"></button>
+                                    <button class="ql-strike"></button>
+                                </span>
+                                <span class="ql-formats">
+                                    <select class="ql-font"></select>
+                                    <select class="ql-size"></select>
+                                </span>
+                            </f:facet>
+                        </p:textEditor>
+                    </div>
+
+                    <div class="p-field" style="margin: 16px;">
+                        <label for="majorp">Major points</label>
+                        <p:textEditor id="majorp" value="#{createReview.majorPoints}">
+                            <f:facet name="toolbar">
+                                <span class="ql-formats">
+                                    <button class="ql-bold"></button>
+                                    <button class="ql-italic"></button>
+                                    <button class="ql-underline"></button>
+                                    <button class="ql-strike"></button>
+                                </span>
+                                <span class="ql-formats">
+                                    <select class="ql-font"></select>
+                                    <select class="ql-size"></select>
+                                </span>
+                            </f:facet>
+                        </p:textEditor>
+                    </div>
+
+                    <div class="p-field" style="margin: 16px;">
+                        <label for="minorp">Minor points</label>
+                        <p:textEditor id="minorp" value="#{createReview.minorPoints}">
+                            <f:facet name="toolbar">
+                                <span class="ql-formats">
+                                    <button class="ql-bold"></button>
+                                    <button class="ql-italic"></button>
+                                    <button class="ql-underline"></button>
+                                    <button class="ql-strike"></button>
+                                </span>
+                                <span class="ql-formats">
+                                    <select class="ql-font"></select>
+                                    <select class="ql-size"></select>
+                                </span>
+                            </f:facet>
+                        </p:textEditor>
+                    </div>
+
+                    <div class="p-field" style="margin: 16px;">
+                        <label for="lastname">Recommendation</label>
+                        <p:selectOneRadio value="#{createReview.recommendation}">
+                            <f:selectItem itemLabel="Accept" itemValue="Accept"/>
+                            <f:selectItem itemLabel="Reject" itemValue="Reject"/>
+                            <f:selectItem itemLabel="Minor revision" itemValue="Minor revision"/>
+                            <f:selectItem itemLabel="Major revision" itemValue="Major revision"/>
+                        </p:selectOneRadio>
+                    </div>
+
+                    <p:commandButton value="Submit" action="#{createReview.saveReview()}"/>
+                </div>
+            </p:card>
+
+        </h:form>
     </h:body>
 </html>

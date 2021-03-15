@@ -1,15 +1,12 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.pijner.articlerevsys.connector;
 
 /**
+ * This class holds details of reviews in the web application
  *
- * @author Prahar
+ * @author Prahar Ijner
  */
 public class Review {
+
     protected String name;
     protected String title;
     protected String url;
@@ -18,6 +15,37 @@ public class Review {
     protected String majorPoints;
     protected String minorPoints;
     protected String recommendation;
+    protected int numScores;
+    protected float averageScore;
+    protected int reviewID;
+
+    public Review() {
+        this.name = "";
+        this.title = "";
+        this.url = "";
+        this.summary = "";
+        this.posneg = "";
+        this.majorPoints = "";
+        this.minorPoints = "";
+        this.recommendation = "";
+        this.numScores = 0;
+        this.averageScore = 0;
+        this.reviewID = -1;
+    }
+
+    public Review(String name, String title, String url, String summary, String posneg, String majorPoints, String minorPoints, String recommendation, int numScores, float averageScore, int reviewID) {
+        this.name = name;
+        this.title = title;
+        this.url = url;
+        this.summary = summary;
+        this.posneg = posneg;
+        this.majorPoints = majorPoints;
+        this.minorPoints = minorPoints;
+        this.recommendation = recommendation;
+        this.numScores = numScores;
+        this.averageScore = averageScore;
+        this.reviewID = reviewID;
+    }
 
     public Review(String name, String title, String url, String summary, String posneg, String majorPoints, String minorPoints, String recommendation) {
         this.name = name;
@@ -28,6 +56,9 @@ public class Review {
         this.majorPoints = majorPoints;
         this.minorPoints = minorPoints;
         this.recommendation = recommendation;
+        this.numScores = 0;
+        this.averageScore = 0;
+        this.reviewID = -1;
     }
 
     public String getName() {
@@ -93,6 +124,29 @@ public class Review {
     public void setRecommendation(String recommendation) {
         this.recommendation = recommendation;
     }
-    
-    
+
+    public float getAverageScore() {
+        return averageScore;
+    }
+
+    public void setAverageScore(float averageScore) {
+        this.averageScore = averageScore;
+    }
+
+    public int getNumScores() {
+        return numScores;
+    }
+
+    public void setNumScores(int numScores) {
+        this.numScores = numScores;
+    }
+
+    public int getReviewID() {
+        return reviewID;
+    }
+
+    public void setReviewID(int reviewID) {
+        this.reviewID = reviewID;
+    }
+
 }

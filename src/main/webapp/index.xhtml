@@ -1,4 +1,7 @@
 <?xml version='1.0' encoding='UTF-8' ?>
+<!--
+This is the landing page for the website. It is mainly a static page with two buttons
+-->
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
@@ -6,20 +9,17 @@
     <h:head>
         <title>Welcome to ArticleRevSys</title>
     </h:head>
-    <h:body style="background: #eeeeee">
-        <p:card style="text-align: center; background: #c8d6e5; margin-top: 10%">
+    <h:body style="background: #2980b9">
+        <p:card style="text-align: center; background: #ffffff; margin-top: 10%">
             <p:outputLabel>
-                <h1 style="color: #10ac84"> Welcome to ArticleRevSys </h1>
-        
-            <p>ArticleRevSys is a JSF web application to allow article reviewers to add reviews on articles and score existing reviews.</p>
+                <h1 style="color: #2980b9"> Welcome to ArticleRevSys </h1>
+                <p>ArticleRevSys is a JSF web application to allow article reviewers to add reviews on articles and score existing reviews.</p>
             </p:outputLabel>
-        <!--</p:card>-->
-        <br/>
-        <!--<p:card style="margin: 0 auto">-->
-        <h:form>
-                <p:commandButton value="Submit a new review" styleClass="ui-button-outlined ui-button-secondary" style="margin: 0 auto; margin-right: .5rem" action="new_review"/>
-                <p:commandButton value="Look up existing reviews" styleClass="ui-button-outlined ui-button-secondary" style="margin: auto;" action="lookup"/>
-        </h:form>
+            <br/>
+            <h:form>
+                <p:commandButton value="Submit a new review" styleClass="ui-button-outlined ui-button-secondary" style="margin: 0 auto; margin-right: .5rem;" action="/new_review.xhtml?faces-redirect=true"/>
+                <p:commandButton value="Look up existing reviews" styleClass="ui-button-outlined ui-button-secondary" style="margin: auto;" action="/lookup.xhtml?faces-redirect=true"/>
+            </h:form>
         </p:card>
     </h:body>
 </html>

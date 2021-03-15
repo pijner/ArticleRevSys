@@ -1,30 +1,71 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-To change this license header, choose License Headers in Project Properties.
-To change this template file, choose Tools | Templates
-and open the template in the editor.
+This page is where the user would see a Data table of the reviews in the database. Each review appears as a row and can be opened and scores.
+There is no error checking in place to prevent users from scoring their own reviews or scoring a review multiple times.
 -->
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:p="http://primefaces.org/ui"
-      xmlns:ui="http://java.sun.com/jsf/facelets">
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
     <h:head>
         <title>Look up existing reviews to score</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     </h:head>
     <h:body>
         <ui:include src="/template/_header.xhtml"/>
-        <h:form>
+        <h:form id="form" style="margin-top: 0.25%">
             <div class="card">
-                <p:dataTable var="row" >
-                    <!--<p:column field="code" headerText="Code" sortable="false" filterable="false" />-->
+                <p:dataTable var="row" value="#{lookup.availableReviews}" tableStyle="table-layout: auto;">
                     <p:column field="name" headerText="Reviewer" />
                     <p:column field="title" headerText="Title" />
-                    <p:column field="url" headerText="URL" />
+                    <p:column field="recommendation" headerText="Recommendation" />
+                    <p:column field="averageScore" headerText="Average Score"/>
+                    <p:column headerText="" filterable="false">
+                        <p:commandButton value="Open" update=":reviewDetail" oncomplete="PF('reviewPreview').initPosition(); PF('reviewPreview').show()">
+                            <f:setPropertyActionListener value="#{row}" target="#{lookup.selectedReview}"/>
+                        </p:commandButton>
+                    </p:column>
                 </p:dataTable>
             </div>
         </h:form>
-        
+
+        <p:dialog header="Review info" widgetVar="reviewPreview" position="center center" height="600" width="900">
+            <p:outputPanel id="reviewDetail" style="text-align: left; width: 100%">
+                <p:column rendered="#{not empty lookup.selectedReview}">
+                    <h:panelGrid columns="2" style="text-align: left; width: 100%">
+                        <p:outputLabel value="Reviewer:"/>
+                        <p:outputLabel value="#{lookup.selectedReview.name}"/>
+                        <p:outputLabel value="Title:"/>
+                        <p:outputLabel value="#{lookup.selectedReview.title}"/>
+                        <p:outputLabel value="URL:"/>
+                        <p:outputLabel value="#{lookup.selectedReview.url}"/>
+                        <p:outputLabel value="Summary:"/>
+                        <p:textEditor value="#{lookup.selectedReview.summary}" readonly="true" toolbarVisible="false"/>
+                        <p:outputLabel value="Positives/Negatives:"/>
+                        <p:textEditor value="#{lookup.selectedReview.posneg}" readonly="true" toolbarVisible="false"/>
+                        <p:outputLabel value="Major points:"/>
+                        <p:textEditor value="#{lookup.selectedReview.majorPoints}" readonly="true" toolbarVisible="false"/>
+                        <p:outputLabel value="Minor points:"/>
+                        <p:textEditor value="#{lookup.selectedReview.minorPoints}" readonly="true" toolbarVisible="false"/>
+                        <p:outputLabel value="Recommendation:"/>
+                        <p:outputLabel value="#{lookup.selectedReview.recommendation}"/>
+                    </h:panelGrid>
+                </p:column>
+            </p:outputPanel>
+            <h:form>
+                <h5>Score</h5>
+                <h:panelGrid columns="1" style="width: 100%; margin: 2%">
+                    <p:outputLabel value="Your name"/>
+                    <p:inputText value="#{user.name}" style="width: 100%; margin-bottom: 5%"/>
+                    <p:outputLabel value="Score this review (0-10)"/>
+                    <p:inputText id="txt3" value="#{lookup.selectedReviewScore}" style="width: 100%"/>
+                    <p:slider for="txt3" step="1" maxValue="10" style="width: 100%"/>
+                </h:panelGrid>
+
+                <p:commandButton value="Submit" style="margin: 1%; width: 100%" action="#{lookup.submitScore()}"/>
+            </h:form>
+        </p:dialog>
     </h:body>
 </html>
