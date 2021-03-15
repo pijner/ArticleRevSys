@@ -9,6 +9,12 @@ The application consists of a landing page and two main webpages:
 Notes:
  - There is no User Account Management (UAM) currently implemented in this application. As such, users are free to score a review multiple times. Furthermore, they can score their own review too. This can be handeled by preventing users to score reviews with the same `user_id` or by adding a UAM module to the app. As per requirement specifications, this was avoided for simplicity.
 
+## Workflow
+![](ArticleRevSys_workflow.png)
+
+## Database ER Diagram
+![](./database/ERdiagram.jpg)
+
 ## Usage
 ### Using docker compose
 1. Clone the repo to your computer
@@ -33,4 +39,3 @@ Notes:
 2. Start the MySQL server and create the database using the script in `database/create.sql`. The database will be initialized with 0 entries
 3. Go to `DBConnector.java` and update the connection parameters in the constructor.
 4. Run the project
-
