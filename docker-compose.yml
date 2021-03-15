@@ -1,0 +1,22 @@
+version: "3.7"
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mysqlserver
+    hostname: mysqlserver
+    ports:
+      - 3305:3306
+    environment: 
+      MYSQL_ROOT_PASSWORD: password123
+    volumes:
+      - ./database/create.sql:/docker-entrypoint-initdb.d/create.sql
+  
+  app:
+    image: payara/server-full
+    container_name: payaraweb
+    hostname: payaraweb
+    ports:
+      - 8080:8080
+    volumes:
+      - ./target/ArticleRevSys-1.0.war:/opt/payara/deployments/ArticleRevSys-1.0.war

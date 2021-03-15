@@ -1,0 +1,8 @@
+com\pijner\articlerevsys\connector\ReviewStatus.class
+com\pijner\articlerevsys\resources\JavaEE8Resource.class
+com\pijner\articlerevsys\connector\DBConnector.class
+com\pijner\articlerevsys\connector\Lookup.class
+com\pijner\articlerevsys\JAXRSConfiguration.class
+com\pijner\articlerevsys\connector\Review.class
+com\pijner\articlerevsys\connector\User.class
+com\pijner\articlerevsys\connector\CreateReview.class
